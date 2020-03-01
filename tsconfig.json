@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "outDir": "./dist/",
+    "module": "ESNext",
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "es2017"
+    ],
+    "importHelpers": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "jsx": "react",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "noUnusedLocals": true,
+    "pretty": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "preserveConstEnums": true,
+    "allowJs": true,
+  },
+  "include": [
+    "./src/**/*",
+    "webpack.config.ts"
+  ]
+}
