@@ -2,6 +2,15 @@ import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import path from 'path';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import webpack from 'webpack';
+import dotenv from 'dotenv';
+
+const env = Object.entries(dotenv.config().parsed || {}).reduce(
+  (result, [key, value]) => ({
+    ...result,
+    [key]: JSON.stringify(value),
+  }),
+  {},
+);
 
 const enum Mode {
   PRODUCTION = 'production',
@@ -39,7 +48,8 @@ const config: webpack.Configuration = {
   plugins: [
     ...(isProduction ? [new CleanWebpackPlugin()] : []),
     new webpack.DefinePlugin({
-      'process.env.PRODUCTION': isProduction,
+      PRODUCTION: isProduction,
+      ...env,
     }),
     new HtmlWebpackPlugin({ template: './index.html' }),
   ],

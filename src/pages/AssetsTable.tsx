@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -11,11 +11,11 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Container from '@material-ui/core/Container';
 
-import assets from 'assets.mock';
 import {
   startObservingAssets,
   finishObservingAssets,
 } from 'modules/assets/actions';
+import { getAssetsList } from 'modules/assets/selectors';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -29,6 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
 const AssetsTable: React.FC = () => {
   const styles = useStyles();
   const dispatch = useDispatch();
+  const assetsList = useSelector(getAssetsList);
 
   useEffect(() => {
     dispatch(startObservingAssets());
@@ -52,7 +53,7 @@ const AssetsTable: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {assets.map(asset => (
+            {assetsList.map(asset => (
               <TableRow key={asset.id}>
                 <TableCell>{asset.id}</TableCell>
                 <TableCell>{asset.name}</TableCell>

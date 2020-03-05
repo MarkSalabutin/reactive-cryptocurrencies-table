@@ -1,25 +1,30 @@
-import { AssetsState, ActionTypes } from './types';
-import { Action, SetAssetsPayload } from './actions';
+import { Assets, ActionTypes } from './types';
+import { Action, SetAssetsPricePayload } from './actions';
 
-const INITIAL_STATE: AssetsState = {
-  list: [],
-};
+import assets from './assets.mock';
 
-const setAssets = (
-  state: AssetsState,
-  payload: SetAssetsPayload,
-): AssetsState => ({
-  ...state,
-  list: payload.assets,
-});
+const INITIAL_STATE: Assets = assets;
 
-const reducer = (
-  state: AssetsState = INITIAL_STATE,
-  action: Action,
-): AssetsState => {
+const setAssetsPrice = (
+  state: Assets,
+  payload: SetAssetsPricePayload,
+): Assets =>
+  Object.keys(payload).reduce(
+    (result, cryptoName) => ({
+      ...result,
+      [cryptoName]: {
+        ...state[cryptoName],
+        price: payload[cryptoName],
+        lastUpdate: Date.now(),
+      },
+    }),
+    state,
+  );
+
+const reducer = (state: Assets = INITIAL_STATE, action: Action): Assets => {
   switch (action.type) {
     case ActionTypes.SET_ASSETS:
-      return setAssets(state, action.payload);
+      return setAssetsPrice(state, action.payload);
     default:
       return state;
   }

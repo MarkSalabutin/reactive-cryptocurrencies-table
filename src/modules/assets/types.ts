@@ -1,8 +1,6 @@
 import { Asset } from 'types';
 
-export interface AssetsState {
-  list: Asset[];
-}
+export type Assets = Record<string, Asset>;
 
 export const enum ActionTypes {
   SET_ASSETS = 'assets/SET_ASSETS',

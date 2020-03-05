@@ -1,14 +1,12 @@
-import { Asset } from 'types';
-
 import { ActionTypes } from './types';
 
-export const setAssets = (payload: { assets: Asset[] }) => ({
+export const setAssetsPrice = (payload: Record<string, number>) => ({
   type: ActionTypes.SET_ASSETS as const,
   payload,
 });
 
-export type SetAssetsPayload = Parameters<typeof setAssets>[0];
-export type SetAssets = ReturnType<typeof setAssets>;
+export type SetAssetsPricePayload = Parameters<typeof setAssetsPrice>[0];
+export type SetAssetsPrice = ReturnType<typeof setAssetsPrice>;
 
 export const startObservingAssets = () => ({
   type: ActionTypes.START_OBSERVING_ASSETS as const,
@@ -22,4 +20,7 @@ export const finishObservingAssets = () => ({
 
 export type FinishObservingAssets = ReturnType<typeof finishObservingAssets>;
 
-export type Action = SetAssets | StartObservingAssets | FinishObservingAssets;
+export type Action =
+  | SetAssetsPrice
+  | StartObservingAssets
+  | FinishObservingAssets;

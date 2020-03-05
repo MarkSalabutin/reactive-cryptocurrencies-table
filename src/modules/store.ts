@@ -1,21 +1,17 @@
-import { createStore, combineReducers, applyMiddleware } from 'redux';
-import createSagaMiddleware from 'redux-saga';
+import { createStore, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
+import { createEpicMiddleware } from 'redux-observable';
 
-import assetsReducer from './assets/reducer';
-import rootSaga from './saga';
+import { rootEpic, rootReducer } from './root';
 
-const rootReducer = combineReducers({
-  assets: assetsReducer,
-});
-const sagaMiddleware = createSagaMiddleware();
+const epicMiddleware = createEpicMiddleware();
 
 const store = createStore(
   rootReducer,
-  composeWithDevTools(applyMiddleware(sagaMiddleware)),
+  composeWithDevTools(applyMiddleware(epicMiddleware)),
 );
 
-sagaMiddleware.run(rootSaga);
+epicMiddleware.run(rootEpic);
 
 export type Store = typeof store;
 
