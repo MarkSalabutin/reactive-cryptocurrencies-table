@@ -28,7 +28,7 @@ const Header: React.FC = () => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6">Reactive Assets App</Typography>
+          <Typography variant="h6">Reactive Cryptocurrencies App</Typography>
         </Toolbar>
       </AppBar>
       <Toolbar variant="dense" />

@@ -1,16 +1,16 @@
 import { combineReducers } from 'redux';
 import { combineEpics } from 'redux-observable';
 
-import assetsReducer from './assets/reducer';
-import assetsEpic from './assets/epics';
-import { Assets } from './assets/types';
+import coinsReducer from './coins/reducer';
+import coinsEpic from './coins/epics';
+import { Coins } from './coins/types';
 
 export interface State {
-  assets: Assets;
+  coins: Coins;
 }
 
 export const rootReducer = combineReducers({
-  assets: assetsReducer,
+  coins: coinsReducer,
 });
 
-export const rootEpic = combineEpics(assetsEpic);
+export const rootEpic = combineEpics(coinsEpic);

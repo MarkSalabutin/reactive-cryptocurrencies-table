@@ -12,10 +12,10 @@ import Paper from '@material-ui/core/Paper';
 import Container from '@material-ui/core/Container';
 
 import {
-  startObservingAssets,
-  finishObservingAssets,
-} from 'modules/assets/actions';
-import { getAssetsList } from 'modules/assets/selectors';
+  finishObservingCoinPrices,
+  startObservingCoinPrices,
+} from 'modules/coins/actions';
+import { getCoinsList } from 'modules/coins/selectors';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -26,16 +26,16 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const AssetsTable: React.FC = () => {
+const CoinsTable: React.FC = () => {
   const styles = useStyles();
   const dispatch = useDispatch();
-  const assetsList = useSelector(getAssetsList);
+  const coinsList = useSelector(getCoinsList);
 
   useEffect(() => {
-    dispatch(startObservingAssets());
+    dispatch(startObservingCoinPrices());
 
     return () => {
-      dispatch(finishObservingAssets());
+      dispatch(finishObservingCoinPrices());
     };
   }, [dispatch]);
 
@@ -47,20 +47,22 @@ const AssetsTable: React.FC = () => {
             <TableRow>
               <TableCell>ID</TableCell>
               <TableCell>Name</TableCell>
+              <TableCell>Symbol</TableCell>
               <TableCell>Price</TableCell>
-              <TableCell>Type</TableCell>
+              <TableCell>Market Cap</TableCell>
               <TableCell>Last update</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {assetsList.map(asset => (
-              <TableRow key={asset.id}>
-                <TableCell>{asset.id}</TableCell>
-                <TableCell>{asset.name}</TableCell>
-                <TableCell>{asset.price.toFixed(2)}</TableCell>
-                <TableCell>{asset.type}</TableCell>
+            {coinsList.map(coin => (
+              <TableRow key={coin.id}>
+                <TableCell>{coin.id}</TableCell>
+                <TableCell>{coin.name}</TableCell>
+                <TableCell>{coin.symbol}</TableCell>
+                <TableCell>{`${coin.price.toFixed(2)} $`}</TableCell>
+                <TableCell>{`${coin.marketCap.toFixed(2)} $`}</TableCell>
                 <TableCell>
-                  {new Date(asset.lastUpdate).toLocaleString()}
+                  {new Date(coin.lastUpdate).toLocaleString()}
                 </TableCell>
               </TableRow>
             ))}
@@ -71,4 +73,4 @@ const AssetsTable: React.FC = () => {
   );
 };
 
-export default AssetsTable;
+export default CoinsTable;

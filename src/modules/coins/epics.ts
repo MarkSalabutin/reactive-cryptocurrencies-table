@@ -4,10 +4,10 @@ import { ofType, Epic } from 'redux-observable';
 import { ajax } from 'rxjs/ajax';
 import { Action } from 'redux';
 
-import { ActionTypes, AssetPricesResponse, AssetPrices } from './types';
-import { setAssetPrices } from './actions';
+import { ActionTypes, CoinPricesResponse, CoinPrices } from './types';
+import { setCoinPrices } from './actions';
 
-const cryptoToWatch = [
+const coinsToWatch = [
   'BTC',
   'ETH',
   'XRP',
@@ -22,27 +22,29 @@ const cryptoToWatch = [
 
 const cryptoToConvert = 'USD';
 
-const url = `${API_URL}/pricemulti?fsyms=${cryptoToWatch}&tsyms=${cryptoToConvert}&api_key=${API_KEY}`;
+const url = `${API_URL}/pricemulti?fsyms=${coinsToWatch}&tsyms=${cryptoToConvert}&api_key=${API_KEY}`;
 
-const assetsEpic: Epic = (action$: Observable<Action>) =>
+const coinsEpic: Epic = (action$: Observable<Action>) =>
   action$.pipe(
-    ofType(ActionTypes.START_OBSERVING_ASSETS),
+    ofType(ActionTypes.START_OBSERVING_COIN_PRICES),
     switchMapTo(
       interval(10000).pipe(
         switchMapTo(
           ajax(url).pipe(
-            map(({ response }: { response: AssetPricesResponse }) =>
-              Object.entries(response).reduce<AssetPrices>(
+            map(({ response }: { response: CoinPricesResponse }) =>
+              Object.entries(response).reduce<CoinPrices>(
                 (result, [key, value]) => ({ ...result, [key]: value.USD }),
                 {},
               ),
             ),
           ),
         ),
-        takeUntil(action$.pipe(ofType(ActionTypes.FINISH_OBSERVING_ASSETS))),
+        takeUntil(
+          action$.pipe(ofType(ActionTypes.FINISH_OBSERVING_COIN_PRICES)),
+        ),
       ),
     ),
-    map(setAssetPrices),
+    map(setCoinPrices),
   );
 
-export default assetsEpic;
+export default coinsEpic;
