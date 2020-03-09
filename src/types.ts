@@ -3,10 +3,14 @@ export enum AssetType {
   Stock = 'Stock',
   Crypto = 'Crypto',
 }
+
+export type AssetName = string;
+export type AssetPrice = number;
+
 export interface Asset {
   id: number;
-  price: number;
+  price: AssetPrice;
   lastUpdate: number;
   type: AssetType;
-  name: string;
+  name: AssetName;
 }
