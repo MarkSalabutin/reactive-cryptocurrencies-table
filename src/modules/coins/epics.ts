@@ -1,30 +1,30 @@
-import { Observable, interval } from 'rxjs';
-import { switchMapTo, map, takeUntil, tap } from 'rxjs/operators';
+import { Observable, interval, pipe } from 'rxjs';
+import { switchMapTo, map, takeUntil } from 'rxjs/operators';
 import { ofType, Epic, StateObservable } from 'redux-observable';
 import { ajax } from 'rxjs/ajax';
 import { Action } from 'redux';
 
 import { State } from 'modules/rootReducer';
-
 import { ActionTypes, CoinPricesResponse, CoinPrices } from './types';
 import { setCoinPrices } from './actions';
-
-const coinsToWatch = [
-  'BTC',
-  'ETH',
-  'XRP',
-  'BCH',
-  'BSV',
-  'ETC',
-  'LTC',
-  'EOS',
-  'BNB',
-  'ADA',
-] as const;
+import { getCoinSymbolsList } from './selectors';
 
 const cryptoToConvert = 'USD';
 
-const url = `${API_URL}/pricemulti?fsyms=${coinsToWatch}&tsyms=${cryptoToConvert}&api_key=${API_KEY}`;
+const getCoinPricesURL = (coinSyms: string[]) =>
+  `${API_URL}/pricemulti?fsyms=${coinSyms}&tsyms=${cryptoToConvert}&api_key=${API_KEY}`;
+
+const makeCoinPricesRequest = pipe(getCoinSymbolsList, getCoinPricesURL, ajax);
+
+const extractCoinPricesFromResponse = ({
+  response,
+}: {
+  response: CoinPricesResponse;
+}) =>
+  Object.entries(response).reduce<CoinPrices>(
+    (result, [key, value]) => ({ ...result, [key]: value.USD }),
+    {},
+  );
 
 const coinsEpic: Epic = (
   action$: Observable<Action>,
@@ -35,16 +35,8 @@ const coinsEpic: Epic = (
     switchMapTo(
       interval(10000).pipe(
         switchMapTo(
-          ajax(url).pipe(
-            map(({ response }: { response: CoinPricesResponse }) =>
-              Object.entries(response).reduce<CoinPrices>(
-                (result, [key, value]) => ({ ...result, [key]: value.USD }),
-                {},
-              ),
-            ),
-            tap(() => {
-              console.log(state$.value.coins);
-            }),
+          makeCoinPricesRequest(state$.value).pipe(
+            map(extractCoinPricesFromResponse),
           ),
         ),
         takeUntil(
