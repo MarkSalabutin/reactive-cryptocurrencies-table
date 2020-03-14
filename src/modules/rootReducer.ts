@@ -1,10 +1,10 @@
 import { combineReducers } from 'redux';
 
 import coinsReducer from './coins/reducer';
-import { Coins } from './coins/types';
+import { CoinsState } from './coins/types';
 
 export interface State {
-  coins: Coins;
+  coins: CoinsState;
 }
 
 const rootReducer = combineReducers({

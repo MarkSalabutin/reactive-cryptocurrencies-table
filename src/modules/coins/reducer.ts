@@ -1,25 +1,67 @@
-import { Coins, ActionTypes } from './types';
-import { Action, SetCoinPricesPayload } from './actions';
+import { CoinsState, ActionTypes } from './types';
+import {
+  Action,
+  SetCoinPricesPayload,
+  FetchCoinsInfoSuccessPayload,
+} from './actions';
 
-import coins from './coins.mock';
+const INITIAL_STATE: CoinsState = {
+  coins: {},
+  isFetching: false,
+};
 
-const INITIAL_STATE: Coins = coins;
+const fetchCoinsInfoRequest = (state: CoinsState): CoinsState => ({
+  ...state,
+  isFetching: true,
+});
 
-const setCoinPrices = (state: Coins, payload: SetCoinPricesPayload): Coins =>
-  Object.keys(payload).reduce(
-    (result, cryptoName) => ({
-      ...result,
-      [cryptoName]: {
-        ...state[cryptoName],
-        price: payload[cryptoName],
+const fetchCoinsInfoSuccess = (
+  state: CoinsState,
+  payload: FetchCoinsInfoSuccessPayload,
+): CoinsState => ({
+  ...state,
+  isFetching: false,
+  coins: payload,
+});
+
+const fetchCoinsInfoCanceled = (state: CoinsState): CoinsState => ({
+  ...state,
+  isFetching: false,
+});
+
+const setCoinPrices = (
+  state: CoinsState,
+  payload: SetCoinPricesPayload,
+): CoinsState => {
+  const updatedCoins = Object.keys(payload).reduce(
+    (coins, coinName) => ({
+      ...coins,
+      [coinName]: {
+        ...coins[coinName],
+        price: payload[coinName],
         lastUpdate: Date.now(),
       },
     }),
-    state,
+    state.coins,
   );
 
-const reducer = (state: Coins = INITIAL_STATE, action: Action): Coins => {
+  return {
+    ...state,
+    coins: updatedCoins,
+  };
+};
+
+const reducer = (
+  state: CoinsState = INITIAL_STATE,
+  action: Action,
+): CoinsState => {
   switch (action.type) {
+    case ActionTypes.FETCH_COINS_INFO_REQUEST:
+      return fetchCoinsInfoRequest(state);
+    case ActionTypes.FETCH_COINS_INFO_SUCCESS:
+      return fetchCoinsInfoSuccess(state, action.payload);
+    case ActionTypes.FETCH_COINS_INFO_CANCELED:
+      return fetchCoinsInfoCanceled(state);
     case ActionTypes.SET_COIN_PRICES:
       return setCoinPrices(state, action.payload);
     default:

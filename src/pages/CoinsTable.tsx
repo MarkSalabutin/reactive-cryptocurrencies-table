@@ -14,8 +14,10 @@ import Container from '@material-ui/core/Container';
 import {
   finishObservingCoinPrices,
   startObservingCoinPrices,
+  fetchCoinsInfoRequest,
+  fetchCoinsInfoCanceled,
 } from 'modules/coins/actions';
-import { getCoinsList } from 'modules/coins/selectors';
+import { getCoinsList, getCoinsFetchingState } from 'modules/coins/selectors';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -30,14 +32,29 @@ const CoinsTable: React.FC = () => {
   const styles = useStyles();
   const dispatch = useDispatch();
   const coinsList = useSelector(getCoinsList);
+  const isFetchingCoins = useSelector(getCoinsFetchingState);
 
   useEffect(() => {
-    dispatch(startObservingCoinPrices());
+    dispatch(fetchCoinsInfoRequest());
 
     return () => {
-      dispatch(finishObservingCoinPrices());
+      dispatch(fetchCoinsInfoCanceled());
     };
   }, [dispatch]);
+
+  useEffect(() => {
+    if (!isFetchingCoins) {
+      dispatch(startObservingCoinPrices());
+
+      return () => {
+        dispatch(finishObservingCoinPrices());
+      };
+    }
+  }, [dispatch, isFetchingCoins]);
+
+  if (isFetchingCoins) {
+    return <h1>Loading...</h1>;
+  }
 
   return (
     <Container maxWidth="lg" className={styles.container}>
