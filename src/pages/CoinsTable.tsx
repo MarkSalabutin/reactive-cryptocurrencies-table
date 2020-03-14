@@ -52,10 +52,6 @@ const CoinsTable: React.FC = () => {
     }
   }, [dispatch, isFetchingCoins]);
 
-  if (isFetchingCoins) {
-    return <h1>Loading...</h1>;
-  }
-
   return (
     <Container maxWidth="lg" className={styles.container}>
       <TableContainer component={Paper}>
