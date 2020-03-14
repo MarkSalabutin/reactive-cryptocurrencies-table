@@ -1,5 +1,11 @@
 import { Observable, interval, pipe } from 'rxjs';
-import { switchMapTo, map, takeUntil } from 'rxjs/operators';
+import {
+  switchMapTo,
+  switchMap,
+  map,
+  takeUntil,
+  withLatestFrom,
+} from 'rxjs/operators';
 import { ofType, Epic, StateObservable, combineEpics } from 'redux-observable';
 import { ajax } from 'rxjs/ajax';
 import { Action } from 'redux';
@@ -20,7 +26,7 @@ const cryptoToConvert = 'USD';
 const getCoinPricesURL = (coinSyms: string[]) =>
   `${API_URL}/pricemulti?fsyms=${coinSyms}&tsyms=${cryptoToConvert}&api_key=${API_KEY}`;
 
-const coinsInfoURL = `${API_URL}/top/mktcapfull?limit=100&tsym=USD`;
+const coinsInfoURL = `${API_URL}/top/mktcapfull?limit=70&tsym=USD`;
 
 const makeCoinPricesRequest = pipe(getCoinSymbolsList, getCoinPricesURL, ajax);
 
@@ -75,10 +81,9 @@ const observingCoinPricesEpic: Epic = (
     ofType(ActionTypes.START_OBSERVING_COIN_PRICES),
     switchMapTo(
       interval(10000).pipe(
-        switchMapTo(
-          makeCoinPricesRequest(state$.value).pipe(
-            map(extractCoinPricesFromResponse),
-          ),
+        withLatestFrom(state$),
+        switchMap(([, state]) =>
+          makeCoinPricesRequest(state).pipe(map(extractCoinPricesFromResponse)),
         ),
         takeUntil(
           action$.pipe(ofType(ActionTypes.FINISH_OBSERVING_COIN_PRICES)),
