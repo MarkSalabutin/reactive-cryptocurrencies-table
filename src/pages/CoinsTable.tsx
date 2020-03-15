@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
@@ -18,11 +18,15 @@ import {
   startObservingCoinPrices,
   fetchCoinsInfoRequest,
   fetchCoinsInfoCanceled,
+  sortCoins,
 } from 'modules/coins/actions';
-import { getCoinsList, getCoinsFetchingState } from 'modules/coins/selectors';
+import {
+  getSortedCoinsList,
+  getCoinsFetchingState,
+  getCoinsSorting,
+} from 'modules/coins/selectors';
 
 import { Order, CoinKey } from 'types';
-import { immutableSort, getComparator } from 'utils';
 
 import { TableItem } from './types';
 
@@ -77,10 +81,9 @@ const useStyles = makeStyles((theme: Theme) =>
 const CoinsTable: React.FC = () => {
   const styles = useStyles();
   const dispatch = useDispatch();
-  const coinsList = useSelector(getCoinsList);
+  const coinsList = useSelector(getSortedCoinsList);
   const isFetchingCoins = useSelector(getCoinsFetchingState);
-  const [orderBy, setOrderBy] = useState<CoinKey>('marketCap');
-  const [order, setOrder] = useState<Order>(Order.desc);
+  const { by: sortBy, order } = useSelector(getCoinsSorting);
 
   useEffect(() => {
     dispatch(fetchCoinsInfoRequest());
@@ -100,11 +103,8 @@ const CoinsTable: React.FC = () => {
     }
   }, [dispatch, isFetchingCoins]);
 
-  const handleOrderChange = (nextOrderBy: CoinKey) => {
-    setOrderBy(nextOrderBy);
-    const nextOrder =
-      nextOrderBy === orderBy && order === Order.desc ? Order.asc : Order.desc;
-    setOrder(nextOrder);
+  const handleOrderChange = (name: CoinKey) => {
+    dispatch(sortCoins(name));
   };
 
   return (
@@ -115,12 +115,12 @@ const CoinsTable: React.FC = () => {
             <TableRow>
               {tableConfig.map(({ name, label, numeric }) => (
                 <TableCell
-                  sortDirection={orderBy === name ? order : false}
+                  sortDirection={sortBy === name ? order : false}
                   align={numeric ? 'right' : 'left'}
                 >
                   <TableSortLabel
-                    active={orderBy === name}
-                    direction={orderBy === name ? order : Order.desc}
+                    active={sortBy === name}
+                    direction={sortBy === name ? order : Order.desc}
                     onClick={() => handleOrderChange(name)}
                   >
                     {label}
@@ -147,17 +147,15 @@ const CoinsTable: React.FC = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              immutableSort(coinsList, getComparator(order, orderBy)).map(
-                coin => (
-                  <TableRow key={coin.id}>
-                    {tableConfig.map(({ name, format, numeric }) => (
-                      <TableCell align={numeric ? 'right' : 'left'}>
-                        {format ? format(coin[name]) : coin[name]}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ),
-              )
+              coinsList.map(coin => (
+                <TableRow key={coin.id}>
+                  {tableConfig.map(({ name, format, numeric }) => (
+                    <TableCell align={numeric ? 'right' : 'left'}>
+                      {format ? format(coin[name]) : coin[name]}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
             )}
           </TableBody>
         </Table>

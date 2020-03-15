@@ -1,4 +1,22 @@
+import { CoinKey } from 'types';
+
 import { ActionTypes, CoinPrices, Coins } from './types';
+
+export const setCoinPrices = (payload: CoinPrices) => ({
+  type: ActionTypes.SET_COIN_PRICES as const,
+  payload,
+});
+
+export type SetCoinPricesPayload = Parameters<typeof setCoinPrices>[0];
+export type SetCoinPrices = ReturnType<typeof setCoinPrices>;
+
+export const sortCoins = (payload: CoinKey) => ({
+  type: ActionTypes.SORT_COINS as const,
+  payload,
+});
+
+export type SortCoinsPayload = Parameters<typeof sortCoins>[0];
+export type SortCoins = ReturnType<typeof sortCoins>;
 
 export const fetchCoinsInfoRequest = () => ({
   type: ActionTypes.FETCH_COINS_INFO_REQUEST as const,
@@ -22,14 +40,6 @@ export const fetchCoinsInfoCanceled = () => ({
 
 export type FetchCoinsInfoCanceled = ReturnType<typeof fetchCoinsInfoCanceled>;
 
-export const setCoinPrices = (payload: CoinPrices) => ({
-  type: ActionTypes.SET_COIN_PRICES as const,
-  payload,
-});
-
-export type SetCoinPricesPayload = Parameters<typeof setCoinPrices>[0];
-export type SetCoinPrices = ReturnType<typeof setCoinPrices>;
-
 export const startObservingCoinPrices = () => ({
   type: ActionTypes.START_OBSERVING_COIN_PRICES as const,
 });
@@ -47,9 +57,10 @@ export type FinishObservingCoinPrices = ReturnType<
 >;
 
 export type Action =
+  | SetCoinPrices
+  | SortCoins
   | FetchCoinsInfoRequest
   | FetchCoinsInfoSuccess
   | FetchCoinsInfoCanceled
-  | SetCoinPrices
   | StartObservingCoinPrices
   | FinishObservingCoinPrices;
