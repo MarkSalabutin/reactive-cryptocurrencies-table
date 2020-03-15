@@ -21,8 +21,43 @@ import {
 } from 'modules/coins/actions';
 import { getCoinsList, getCoinsFetchingState } from 'modules/coins/selectors';
 
-import { Coin, Order, CoinKey } from 'types';
+import { Order, CoinKey } from 'types';
 import { immutableSort, getComparator } from 'utils';
+
+import { TableItem } from './types';
+
+const tableConfig: TableItem[] = [
+  {
+    name: 'id',
+    label: 'ID',
+  },
+  {
+    name: 'name',
+    label: 'Name',
+  },
+  {
+    name: 'symbol',
+    label: 'Symbol',
+  },
+  {
+    name: 'price',
+    label: 'Price',
+    numeric: true,
+    format: (value: number) => `${value.toFixed(2)} $`,
+  },
+  {
+    name: 'marketCap',
+    label: 'Market cap',
+    numeric: true,
+    format: (value: number) => `${Number(value.toFixed(0)).toLocaleString()} $`,
+  },
+  {
+    name: 'lastUpdate',
+    label: 'Last update',
+    numeric: true,
+    format: (value: number) => new Date(value).toLocaleString(),
+  },
+];
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -78,69 +113,20 @@ const CoinsTable: React.FC = () => {
         <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell sortDirection={orderBy === 'id' ? order : false}>
-                <TableSortLabel
-                  active={orderBy === 'id'}
-                  direction={orderBy === 'id' ? order : Order.desc}
-                  onClick={() => handleOrderChange('id')}
+              {tableConfig.map(({ name, label, numeric }) => (
+                <TableCell
+                  sortDirection={orderBy === name ? order : false}
+                  align={numeric ? 'right' : 'left'}
                 >
-                  ID
-                </TableSortLabel>
-              </TableCell>
-              <TableCell sortDirection={orderBy === 'name' ? order : false}>
-                <TableSortLabel
-                  active={orderBy === 'name'}
-                  direction={orderBy === 'name' ? order : Order.desc}
-                  onClick={() => handleOrderChange('name')}
-                >
-                  Name
-                </TableSortLabel>
-              </TableCell>
-              <TableCell sortDirection={orderBy === 'symbol' ? order : false}>
-                <TableSortLabel
-                  active={orderBy === 'symbol'}
-                  direction={orderBy === 'symbol' ? order : Order.desc}
-                  onClick={() => handleOrderChange('symbol')}
-                >
-                  Symbol
-                </TableSortLabel>
-              </TableCell>
-              <TableCell
-                sortDirection={orderBy === 'price' ? order : false}
-                align="right"
-              >
-                <TableSortLabel
-                  active={orderBy === 'price'}
-                  direction={orderBy === 'price' ? order : Order.desc}
-                  onClick={() => handleOrderChange('price')}
-                >
-                  Price
-                </TableSortLabel>
-              </TableCell>
-              <TableCell
-                sortDirection={orderBy === 'marketCap' ? order : false}
-                align="right"
-              >
-                <TableSortLabel
-                  active={orderBy === 'marketCap'}
-                  direction={orderBy === 'marketCap' ? order : Order.desc}
-                  onClick={() => handleOrderChange('marketCap')}
-                >
-                  Market Cap
-                </TableSortLabel>
-              </TableCell>
-              <TableCell
-                sortDirection={orderBy === 'lastUpdate' ? order : false}
-                align="right"
-              >
-                <TableSortLabel
-                  active={orderBy === 'lastUpdate'}
-                  direction={orderBy === 'lastUpdate' ? order : Order.desc}
-                  onClick={() => handleOrderChange('lastUpdate')}
-                >
-                  Last update
-                </TableSortLabel>
-              </TableCell>
+                  <TableSortLabel
+                    active={orderBy === name}
+                    direction={orderBy === name ? order : Order.desc}
+                    onClick={() => handleOrderChange(name)}
+                  >
+                    {label}
+                  </TableSortLabel>
+                </TableCell>
+              ))}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -164,18 +150,11 @@ const CoinsTable: React.FC = () => {
               immutableSort(coinsList, getComparator(order, orderBy)).map(
                 coin => (
                   <TableRow key={coin.id}>
-                    <TableCell>{coin.id}</TableCell>
-                    <TableCell>{coin.name}</TableCell>
-                    <TableCell>{coin.symbol}</TableCell>
-                    <TableCell align="right">
-                      {`${coin.price.toFixed(2)} $`}
-                    </TableCell>
-                    <TableCell align="right">
-                      {`${coin.marketCap.toFixed(2)} $`}
-                    </TableCell>
-                    <TableCell align="right">
-                      {new Date(coin.lastUpdate).toLocaleString()}
-                    </TableCell>
+                    {tableConfig.map(({ name, format, numeric }) => (
+                      <TableCell align={numeric ? 'right' : 'left'}>
+                        {format ? format(coin[name]) : coin[name]}
+                      </TableCell>
+                    ))}
                   </TableRow>
                 ),
               )
