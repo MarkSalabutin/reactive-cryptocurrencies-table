@@ -12,6 +12,11 @@ import Paper from '@material-ui/core/Paper';
 import Container from '@material-ui/core/Container';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
+import Typography from '@material-ui/core/Typography';
+import Toolbar from '@material-ui/core/Toolbar';
+import TextField from '@material-ui/core/TextField';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import SearchIcon from '@material-ui/icons/Search';
 
 import {
   finishObservingCoinPrices,
@@ -69,6 +74,16 @@ const useStyles = makeStyles((theme: Theme) =>
       marginTop: theme.spacing(8),
       marginBottom: theme.spacing(8),
     },
+    toolbar: {
+      backgroundColor: theme.palette.background.default,
+      paddingTop: theme.spacing(2),
+    },
+    title: {
+      flex: '1 1 100%',
+    },
+    search: {
+      minWidth: '250px',
+    },
     tableCointainer: {
       maxHeight: `calc(100vh - ${theme.spacing(22)}px)`,
     },
@@ -110,11 +125,28 @@ const CoinsTable: React.FC = () => {
   return (
     <Container maxWidth="lg" className={styles.container}>
       <TableContainer component={Paper} className={styles.tableCointainer}>
+        <Toolbar className={styles.toolbar}>
+          <Typography variant="h4" className={styles.title}>
+            Coins
+          </Typography>
+          <TextField
+            placeholder="Name"
+            className={styles.search}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Toolbar>
         <Table stickyHeader>
           <TableHead>
             <TableRow>
               {tableConfig.map(({ name, label, numeric }) => (
                 <TableCell
+                  key={name}
                   sortDirection={sortBy === name ? order : false}
                   align={numeric ? 'right' : 'left'}
                 >
@@ -150,7 +182,7 @@ const CoinsTable: React.FC = () => {
               coinsList.map(coin => (
                 <TableRow key={coin.id}>
                   {tableConfig.map(({ name, format, numeric }) => (
-                    <TableCell align={numeric ? 'right' : 'left'}>
+                    <TableCell align={numeric ? 'right' : 'left'} key={name}>
                       {format ? format(coin[name]) : coin[name]}
                     </TableCell>
                   ))}
