@@ -26,6 +26,9 @@ const useStyles = makeStyles((theme: Theme) =>
       marginTop: theme.spacing(8),
       marginBottom: theme.spacing(8),
     },
+    tableCointainer: {
+      maxHeight: `calc(100vh - ${theme.spacing(22)}px)`,
+    },
     emptyStateMessage: {
       fontSize: '1.5rem',
     },
@@ -58,8 +61,8 @@ const CoinsTable: React.FC = () => {
 
   return (
     <Container maxWidth="lg" className={styles.container}>
-      <TableContainer component={Paper}>
-        <Table>
+      <TableContainer component={Paper} className={styles.tableCointainer}>
+        <Table stickyHeader>
           <TableHead>
             <TableRow>
               <TableCell>ID</TableCell>
