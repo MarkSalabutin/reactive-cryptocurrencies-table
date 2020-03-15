@@ -10,6 +10,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Container from '@material-ui/core/Container';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import {
   finishObservingCoinPrices,
@@ -67,18 +68,26 @@ const CoinsTable: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {coinsList.map(coin => (
-              <TableRow key={coin.id}>
-                <TableCell>{coin.id}</TableCell>
-                <TableCell>{coin.name}</TableCell>
-                <TableCell>{coin.symbol}</TableCell>
-                <TableCell>{`${coin.price.toFixed(2)} $`}</TableCell>
-                <TableCell>{`${coin.marketCap.toFixed(2)} $`}</TableCell>
-                <TableCell>
-                  {new Date(coin.lastUpdate).toLocaleString()}
+            {isFetchingCoins ? (
+              <TableRow>
+                <TableCell colSpan={6} align="center">
+                  <CircularProgress />
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              coinsList.map(coin => (
+                <TableRow key={coin.id}>
+                  <TableCell>{coin.id}</TableCell>
+                  <TableCell>{coin.name}</TableCell>
+                  <TableCell>{coin.symbol}</TableCell>
+                  <TableCell>{`${coin.price.toFixed(2)} $`}</TableCell>
+                  <TableCell>{`${coin.marketCap.toFixed(2)} $`}</TableCell>
+                  <TableCell>
+                    {new Date(coin.lastUpdate).toLocaleString()}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>
