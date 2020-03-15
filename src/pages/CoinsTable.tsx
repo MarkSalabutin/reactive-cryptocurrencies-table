@@ -68,9 +68,9 @@ const CoinsTable: React.FC = () => {
               <TableCell>ID</TableCell>
               <TableCell>Name</TableCell>
               <TableCell>Symbol</TableCell>
-              <TableCell>Price</TableCell>
-              <TableCell>Market Cap</TableCell>
-              <TableCell>Last update</TableCell>
+              <TableCell align="right">Price</TableCell>
+              <TableCell align="right">Market Cap</TableCell>
+              <TableCell align="right">Last update</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -96,9 +96,13 @@ const CoinsTable: React.FC = () => {
                   <TableCell>{coin.id}</TableCell>
                   <TableCell>{coin.name}</TableCell>
                   <TableCell>{coin.symbol}</TableCell>
-                  <TableCell>{`${coin.price.toFixed(2)} $`}</TableCell>
-                  <TableCell>{`${coin.marketCap.toFixed(2)} $`}</TableCell>
-                  <TableCell>
+                  <TableCell align="right">
+                    {`${coin.price.toFixed(2)} $`}
+                  </TableCell>
+                  <TableCell align="right">
+                    {`${coin.marketCap.toFixed(2)} $`}
+                  </TableCell>
+                  <TableCell align="right">
                     {new Date(coin.lastUpdate).toLocaleString()}
                   </TableCell>
                 </TableRow>
