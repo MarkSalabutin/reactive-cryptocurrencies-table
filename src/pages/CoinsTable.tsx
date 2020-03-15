@@ -26,6 +26,9 @@ const useStyles = makeStyles((theme: Theme) =>
       marginTop: theme.spacing(8),
       marginBottom: theme.spacing(8),
     },
+    emptyStateMessage: {
+      fontSize: '1.5rem',
+    },
   }),
 );
 
@@ -72,6 +75,16 @@ const CoinsTable: React.FC = () => {
               <TableRow>
                 <TableCell colSpan={6} align="center">
                   <CircularProgress />
+                </TableCell>
+              </TableRow>
+            ) : coinsList.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={6}
+                  align="center"
+                  className={styles.emptyStateMessage}
+                >
+                  No coins have been found.
                 </TableCell>
               </TableRow>
             ) : (
