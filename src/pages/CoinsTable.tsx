@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
@@ -11,6 +11,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Container from '@material-ui/core/Container';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import TableSortLabel from '@material-ui/core/TableSortLabel';
 
 import {
   finishObservingCoinPrices,
@@ -19,6 +20,9 @@ import {
   fetchCoinsInfoCanceled,
 } from 'modules/coins/actions';
 import { getCoinsList, getCoinsFetchingState } from 'modules/coins/selectors';
+
+import { Coin, Order, CoinKey } from 'types';
+import { immutableSort, getComparator } from 'utils';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -40,6 +44,8 @@ const CoinsTable: React.FC = () => {
   const dispatch = useDispatch();
   const coinsList = useSelector(getCoinsList);
   const isFetchingCoins = useSelector(getCoinsFetchingState);
+  const [orderBy, setOrderBy] = useState<CoinKey>('marketCap');
+  const [order, setOrder] = useState<Order>(Order.desc);
 
   useEffect(() => {
     dispatch(fetchCoinsInfoRequest());
@@ -59,18 +65,82 @@ const CoinsTable: React.FC = () => {
     }
   }, [dispatch, isFetchingCoins]);
 
+  const handleOrderChange = (nextOrderBy: CoinKey) => {
+    setOrderBy(nextOrderBy);
+    const nextOrder =
+      nextOrderBy === orderBy && order === Order.desc ? Order.asc : Order.desc;
+    setOrder(nextOrder);
+  };
+
   return (
     <Container maxWidth="lg" className={styles.container}>
       <TableContainer component={Paper} className={styles.tableCointainer}>
         <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Symbol</TableCell>
-              <TableCell align="right">Price</TableCell>
-              <TableCell align="right">Market Cap</TableCell>
-              <TableCell align="right">Last update</TableCell>
+              <TableCell sortDirection={orderBy === 'id' ? order : false}>
+                <TableSortLabel
+                  active={orderBy === 'id'}
+                  direction={orderBy === 'id' ? order : Order.desc}
+                  onClick={() => handleOrderChange('id')}
+                >
+                  ID
+                </TableSortLabel>
+              </TableCell>
+              <TableCell sortDirection={orderBy === 'name' ? order : false}>
+                <TableSortLabel
+                  active={orderBy === 'name'}
+                  direction={orderBy === 'name' ? order : Order.desc}
+                  onClick={() => handleOrderChange('name')}
+                >
+                  Name
+                </TableSortLabel>
+              </TableCell>
+              <TableCell sortDirection={orderBy === 'symbol' ? order : false}>
+                <TableSortLabel
+                  active={orderBy === 'symbol'}
+                  direction={orderBy === 'symbol' ? order : Order.desc}
+                  onClick={() => handleOrderChange('symbol')}
+                >
+                  Symbol
+                </TableSortLabel>
+              </TableCell>
+              <TableCell
+                sortDirection={orderBy === 'price' ? order : false}
+                align="right"
+              >
+                <TableSortLabel
+                  active={orderBy === 'price'}
+                  direction={orderBy === 'price' ? order : Order.desc}
+                  onClick={() => handleOrderChange('price')}
+                >
+                  Price
+                </TableSortLabel>
+              </TableCell>
+              <TableCell
+                sortDirection={orderBy === 'marketCap' ? order : false}
+                align="right"
+              >
+                <TableSortLabel
+                  active={orderBy === 'marketCap'}
+                  direction={orderBy === 'marketCap' ? order : Order.desc}
+                  onClick={() => handleOrderChange('marketCap')}
+                >
+                  Market Cap
+                </TableSortLabel>
+              </TableCell>
+              <TableCell
+                sortDirection={orderBy === 'lastUpdate' ? order : false}
+                align="right"
+              >
+                <TableSortLabel
+                  active={orderBy === 'lastUpdate'}
+                  direction={orderBy === 'lastUpdate' ? order : Order.desc}
+                  onClick={() => handleOrderChange('lastUpdate')}
+                >
+                  Last update
+                </TableSortLabel>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -91,22 +161,24 @@ const CoinsTable: React.FC = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              coinsList.map(coin => (
-                <TableRow key={coin.id}>
-                  <TableCell>{coin.id}</TableCell>
-                  <TableCell>{coin.name}</TableCell>
-                  <TableCell>{coin.symbol}</TableCell>
-                  <TableCell align="right">
-                    {`${coin.price.toFixed(2)} $`}
-                  </TableCell>
-                  <TableCell align="right">
-                    {`${coin.marketCap.toFixed(2)} $`}
-                  </TableCell>
-                  <TableCell align="right">
-                    {new Date(coin.lastUpdate).toLocaleString()}
-                  </TableCell>
-                </TableRow>
-              ))
+              immutableSort(coinsList, getComparator(order, orderBy)).map(
+                coin => (
+                  <TableRow key={coin.id}>
+                    <TableCell>{coin.id}</TableCell>
+                    <TableCell>{coin.name}</TableCell>
+                    <TableCell>{coin.symbol}</TableCell>
+                    <TableCell align="right">
+                      {`${coin.price.toFixed(2)} $`}
+                    </TableCell>
+                    <TableCell align="right">
+                      {`${coin.marketCap.toFixed(2)} $`}
+                    </TableCell>
+                    <TableCell align="right">
+                      {new Date(coin.lastUpdate).toLocaleString()}
+                    </TableCell>
+                  </TableRow>
+                ),
+              )
             )}
           </TableBody>
         </Table>

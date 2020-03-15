@@ -7,5 +7,14 @@ export interface Coin {
   marketCap: number;
 }
 
+export type CoinKey = keyof Coin;
+
 export type CoinPrice = Coin['price'];
 export type CoinSymbol = Coin['symbol'];
+
+export const enum Order {
+  asc = 'asc',
+  desc = 'desc',
+}
+
+export type Comparator<T> = (a: T, b: T) => number;
