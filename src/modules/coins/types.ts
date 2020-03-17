@@ -20,6 +20,10 @@ export interface CoinsInfoResponse {
   }[];
 }
 
+export interface CoinFilters {
+  name: string;
+}
+
 export interface CoinsState {
   coins: Coins;
   isFetching: boolean;
@@ -27,11 +31,13 @@ export interface CoinsState {
     by: CoinKey;
     order: Order;
   };
+  filters: CoinFilters;
 }
 
 export const enum ActionTypes {
   SET_COIN_PRICES = 'coins/SET_COIN_PRICES',
   SORT_COINS = 'coins/SORT_COINS',
+  SET_COIN_FILTERS = 'coins/SET_COIN_FILTERS',
   FETCH_COINS_INFO_REQUEST = 'coins/FETCH_COINS_INFO_REQUEST',
   FETCH_COINS_INFO_SUCCESS = 'coins/FETCH_COINS_INFO_SUCCESS',
   FETCH_COINS_INFO_CANCELED = 'coins/FETCH_COINS_INFO_CANCELED',

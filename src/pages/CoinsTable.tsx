@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
@@ -24,11 +24,13 @@ import {
   fetchCoinsInfoRequest,
   fetchCoinsInfoCanceled,
   sortCoins,
+  setCoinFilters,
 } from 'modules/coins/actions';
 import {
-  getSortedCoinsList,
+  getFilteredSortedCoinsList,
   getCoinsFetchingState,
   getCoinsSorting,
+  getCoinsFilters,
 } from 'modules/coins/selectors';
 
 import { Order, CoinKey } from 'types';
@@ -96,9 +98,11 @@ const useStyles = makeStyles((theme: Theme) =>
 const CoinsTable: React.FC = () => {
   const styles = useStyles();
   const dispatch = useDispatch();
-  const coinsList = useSelector(getSortedCoinsList);
+  const coinsList = useSelector(getFilteredSortedCoinsList);
   const isFetchingCoins = useSelector(getCoinsFetchingState);
   const { by: sortBy, order } = useSelector(getCoinsSorting);
+  const filters = useSelector(getCoinsFilters);
+  const [nameFilter, setNameFilter] = useState(filters.name);
 
   useEffect(() => {
     dispatch(fetchCoinsInfoRequest());
@@ -118,9 +122,30 @@ const CoinsTable: React.FC = () => {
     }
   }, [dispatch, isFetchingCoins]);
 
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      dispatch(
+        setCoinFilters({
+          name: nameFilter,
+        }),
+      );
+    }, 400);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [nameFilter, dispatch]);
+
   const handleOrderChange = (name: CoinKey) => {
     dispatch(sortCoins(name));
   };
+
+  const handleFilterChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setNameFilter(event.target.value);
+    },
+    [],
+  );
 
   return (
     <Container maxWidth="lg" className={styles.container}>
@@ -130,6 +155,9 @@ const CoinsTable: React.FC = () => {
             Coins
           </Typography>
           <TextField
+            onChange={handleFilterChange}
+            name="name"
+            value={nameFilter}
             placeholder="Name"
             className={styles.search}
             InputProps={{

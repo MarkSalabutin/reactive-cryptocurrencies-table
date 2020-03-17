@@ -6,6 +6,7 @@ import {
   SetCoinPricesPayload,
   FetchCoinsInfoSuccessPayload,
   SortCoinsPayload,
+  SetCoinFiltersPayload,
 } from './actions';
 
 const INITIAL_STATE: CoinsState = {
@@ -14,6 +15,9 @@ const INITIAL_STATE: CoinsState = {
   sorting: {
     by: 'marketCap',
     order: Order.desc,
+  },
+  filters: {
+    name: '',
   },
 };
 
@@ -56,6 +60,17 @@ const sortCoins = (state: CoinsState, sortBy: SortCoinsPayload): CoinsState => {
   };
 };
 
+const setCoinFilters = (
+  state: CoinsState,
+  payload: SetCoinFiltersPayload,
+): CoinsState => ({
+  ...state,
+  filters: {
+    ...state.filters,
+    ...payload,
+  },
+});
+
 const fetchCoinsInfoRequest = (state: CoinsState): CoinsState => ({
   ...state,
   isFetching: true,
@@ -84,6 +99,8 @@ const reducer = (
       return setCoinPrices(state, action.payload);
     case ActionTypes.SORT_COINS:
       return sortCoins(state, action.payload);
+    case ActionTypes.SET_COIN_FILTERS:
+      return setCoinFilters(state, action.payload);
     case ActionTypes.FETCH_COINS_INFO_REQUEST:
       return fetchCoinsInfoRequest(state);
     case ActionTypes.FETCH_COINS_INFO_SUCCESS:

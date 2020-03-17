@@ -1,6 +1,6 @@
 import { CoinKey } from 'types';
 
-import { ActionTypes, CoinPrices, Coins } from './types';
+import { ActionTypes, CoinPrices, Coins, CoinFilters } from './types';
 
 export const setCoinPrices = (payload: CoinPrices) => ({
   type: ActionTypes.SET_COIN_PRICES as const,
@@ -17,6 +17,14 @@ export const sortCoins = (payload: CoinKey) => ({
 
 export type SortCoinsPayload = Parameters<typeof sortCoins>[0];
 export type SortCoins = ReturnType<typeof sortCoins>;
+
+export const setCoinFilters = (payload: Partial<CoinFilters>) => ({
+  type: ActionTypes.SET_COIN_FILTERS as const,
+  payload,
+});
+
+export type SetCoinFiltersPayload = Parameters<typeof setCoinFilters>[0];
+export type SetCoinFilters = ReturnType<typeof setCoinFilters>;
 
 export const fetchCoinsInfoRequest = () => ({
   type: ActionTypes.FETCH_COINS_INFO_REQUEST as const,
@@ -59,6 +67,7 @@ export type FinishObservingCoinPrices = ReturnType<
 export type Action =
   | SetCoinPrices
   | SortCoins
+  | SetCoinFilters
   | FetchCoinsInfoRequest
   | FetchCoinsInfoSuccess
   | FetchCoinsInfoCanceled
