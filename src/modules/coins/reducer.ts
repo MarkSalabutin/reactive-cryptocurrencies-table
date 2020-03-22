@@ -7,7 +7,8 @@ import {
   FetchCoinsInfoSuccessPayload,
   SortCoinsPayload,
   SetCoinFiltersPayload,
-  SetCoinsPaginationPayload,
+  SetCoinsPaginationPagePayload,
+  SetCoinsPaginationPerPagePayload,
 } from './actions';
 
 const INITIAL_STATE: CoinsState = {
@@ -76,13 +77,25 @@ const setCoinFilters = (
   },
 });
 
-const setCoinsPagination = (
+const setCoinsPaginationPerPage = (
   state: CoinsState,
-  payload: SetCoinsPaginationPayload,
+  payload: SetCoinsPaginationPerPagePayload,
 ): CoinsState => ({
   ...state,
   pagination: {
-    ...payload,
+    ...state.pagination,
+    perPage: payload,
+  },
+});
+
+const setCoinsPaginationPage = (
+  state: CoinsState,
+  payload: SetCoinsPaginationPagePayload,
+): CoinsState => ({
+  ...state,
+  pagination: {
+    ...state.pagination,
+    page: payload,
   },
 });
 
@@ -116,8 +129,10 @@ const reducer = (
       return sortCoins(state, action.payload);
     case ActionTypes.SET_COIN_FILTERS:
       return setCoinFilters(state, action.payload);
-    case ActionTypes.SET_COINS_PAGINATION:
-      return setCoinsPagination(state, action.payload);
+    case ActionTypes.SET_COINS_PAGINATION_PER_PAGE:
+      return setCoinsPaginationPerPage(state, action.payload);
+    case ActionTypes.SET_COINS_PAGINATION_PAGE:
+      return setCoinsPaginationPage(state, action.payload);
     case ActionTypes.FETCH_COINS_INFO_REQUEST:
       return fetchCoinsInfoRequest(state);
     case ActionTypes.FETCH_COINS_INFO_SUCCESS:

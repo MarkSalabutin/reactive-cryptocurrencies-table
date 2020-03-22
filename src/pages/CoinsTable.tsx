@@ -26,7 +26,8 @@ import {
   fetchCoinsInfoCanceled,
   sortCoins,
   setCoinFilters,
-  setCoinsPagination,
+  setCoinsPaginationPage,
+  setCoinsPaginationPerPage,
 } from 'modules/coins/actions';
 import {
   getCoinsFetchingState,
@@ -157,21 +158,14 @@ const CoinsTable: React.FC = () => {
 
   const handleChangePage = useCallback(
     (event: unknown, newPage: number) => {
-      dispatch(
-        setCoinsPagination({ page: newPage, perPage: pagination.perPage }),
-      );
+      dispatch(setCoinsPaginationPage(newPage));
     },
-    [dispatch, pagination.perPage],
+    [dispatch],
   );
 
   const handleRowsPerPageChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      dispatch(
-        setCoinsPagination({
-          page: 0,
-          perPage: parseInt(event.target.value, 10),
-        }),
-      );
+      dispatch(setCoinsPaginationPerPage(parseInt(event.target.value, 10)));
     },
     [dispatch],
   );

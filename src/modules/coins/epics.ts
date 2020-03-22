@@ -5,6 +5,7 @@ import {
   map,
   takeUntil,
   withLatestFrom,
+  mapTo,
 } from 'rxjs/operators';
 import { ofType, Epic, StateObservable, combineEpics } from 'redux-observable';
 import { ajax } from 'rxjs/ajax';
@@ -18,7 +19,11 @@ import {
   CoinsInfoResponse,
   Coins,
 } from './types';
-import { setCoinPrices, fetchCoinsInfoSuccess } from './actions';
+import {
+  setCoinPrices,
+  fetchCoinsInfoSuccess,
+  setCoinsPaginationPage,
+} from './actions';
 import { getCoinSymbolsList } from './selectors';
 
 const cryptoToConvert = 'USD';
@@ -93,6 +98,19 @@ const observingCoinPricesEpic: Epic = (
     map(setCoinPrices),
   );
 
-const coinsEpic = combineEpics(coinsInfoEpic, observingCoinPricesEpic);
+const coinsPaginationEpic: Epic = (action$: Observable<Action>) =>
+  action$.pipe(
+    ofType(
+      ActionTypes.SET_COINS_PAGINATION_PER_PAGE,
+      ActionTypes.SET_COIN_FILTERS,
+    ),
+    mapTo(setCoinsPaginationPage(0)),
+  );
+
+const coinsEpic = combineEpics(
+  coinsInfoEpic,
+  observingCoinPricesEpic,
+  coinsPaginationEpic,
+);
 
 export default coinsEpic;

@@ -8,6 +8,8 @@ import {
   Pagination,
 } from './types';
 
+export type SetCoinPricePayload = CoinPrices;
+
 export const setCoinPrices = (payload: CoinPrices) => ({
   type: ActionTypes.SET_COIN_PRICES as const,
   payload,
@@ -32,14 +34,26 @@ export const setCoinFilters = (payload: Partial<CoinFilters>) => ({
 export type SetCoinFiltersPayload = Parameters<typeof setCoinFilters>[0];
 export type SetCoinFilters = ReturnType<typeof setCoinFilters>;
 
-export const setCoinsPagination = (payload: Pagination) => ({
-  type: ActionTypes.SET_COINS_PAGINATION as const,
+export const setCoinsPaginationPerPage = (payload: Pagination['perPage']) => ({
+  type: ActionTypes.SET_COINS_PAGINATION_PER_PAGE as const,
   payload,
 });
 
-export type SetCoinsPagination = ReturnType<typeof setCoinsPagination>;
-export type SetCoinsPaginationPayload = Parameters<
-  typeof setCoinsPagination
+export type SetCoinsPaginationPerPage = ReturnType<
+  typeof setCoinsPaginationPerPage
+>;
+export type SetCoinsPaginationPerPagePayload = Parameters<
+  typeof setCoinsPaginationPerPage
+>[0];
+
+export const setCoinsPaginationPage = (payload: Pagination['page']) => ({
+  type: ActionTypes.SET_COINS_PAGINATION_PAGE as const,
+  payload,
+});
+
+export type SetCoinsPaginationPage = ReturnType<typeof setCoinsPaginationPage>;
+export type SetCoinsPaginationPagePayload = Parameters<
+  typeof setCoinsPaginationPage
 >[0];
 
 export const fetchCoinsInfoRequest = () => ({
@@ -84,7 +98,8 @@ export type Action =
   | SetCoinPrices
   | SortCoins
   | SetCoinFilters
-  | SetCoinsPagination
+  | SetCoinsPaginationPerPage
+  | SetCoinsPaginationPage
   | FetchCoinsInfoRequest
   | FetchCoinsInfoSuccess
   | FetchCoinsInfoCanceled
