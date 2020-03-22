@@ -9,12 +9,13 @@ import { CoinFilters } from './types';
 export const getCoinsSorting = (state: State) => state.coins.sorting;
 export const getCoinsList = (state: State) => Object.values(state.coins.coins);
 export const getCoinsFilters = (state: State) => state.coins.filters;
+export const getCoinsPagination = (state: State) => state.coins.pagination;
 
 export const getFilteredSortedCoinsList = createSelector(
   getCoinsList,
   getCoinsFilters,
   getCoinsSorting,
-  (coins, filters: CoinFilters, sorting) => {
+  (coins, filters, sorting) => {
     const filteredCoins = Object.keys(filters).reduce<Coin[]>(
       (result, filterKey) => {
         return result.filter(coin =>
@@ -30,6 +31,22 @@ export const getFilteredSortedCoinsList = createSelector(
       filteredCoins,
       getComparator(sorting.order, sorting.by),
     );
+  },
+);
+
+export const getFilteredSortedCoinsListCount = createSelector(
+  getFilteredSortedCoinsList,
+  coins => coins.length,
+);
+
+export const getFilteredSortedPaginatedCoinsList = createSelector(
+  getFilteredSortedCoinsList,
+  getCoinsPagination,
+  (coins, pagination) => {
+    const start = pagination.page * pagination.perPage;
+    const end = (pagination.page + 1) * pagination.perPage;
+
+    return coins.slice(start, end);
   },
 );
 

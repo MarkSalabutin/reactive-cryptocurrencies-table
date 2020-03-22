@@ -24,6 +24,11 @@ export interface CoinFilters {
   name: string;
 }
 
+export interface Pagination {
+  page: number;
+  perPage: number;
+}
+
 export interface CoinsState {
   coins: Coins;
   isFetching: boolean;
@@ -32,12 +37,14 @@ export interface CoinsState {
     order: Order;
   };
   filters: CoinFilters;
+  pagination: Pagination;
 }
 
 export const enum ActionTypes {
   SET_COIN_PRICES = 'coins/SET_COIN_PRICES',
   SORT_COINS = 'coins/SORT_COINS',
   SET_COIN_FILTERS = 'coins/SET_COIN_FILTERS',
+  SET_COINS_PAGINATION = 'coins/SET_COINS_PAGINATION',
   FETCH_COINS_INFO_REQUEST = 'coins/FETCH_COINS_INFO_REQUEST',
   FETCH_COINS_INFO_SUCCESS = 'coins/FETCH_COINS_INFO_SUCCESS',
   FETCH_COINS_INFO_CANCELED = 'coins/FETCH_COINS_INFO_CANCELED',

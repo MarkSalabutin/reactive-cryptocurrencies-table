@@ -17,6 +17,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import SearchIcon from '@material-ui/icons/Search';
+import TablePagination from '@material-ui/core/TablePagination';
 
 import {
   finishObservingCoinPrices,
@@ -25,12 +26,15 @@ import {
   fetchCoinsInfoCanceled,
   sortCoins,
   setCoinFilters,
+  setCoinsPagination,
 } from 'modules/coins/actions';
 import {
-  getFilteredSortedCoinsList,
   getCoinsFetchingState,
   getCoinsSorting,
   getCoinsFilters,
+  getFilteredSortedPaginatedCoinsList,
+  getFilteredSortedCoinsListCount,
+  getCoinsPagination,
 } from 'modules/coins/selectors';
 
 import { Order, CoinKey } from 'types';
@@ -87,7 +91,7 @@ const useStyles = makeStyles((theme: Theme) =>
       minWidth: '250px',
     },
     tableCointainer: {
-      maxHeight: `calc(100vh - ${theme.spacing(22)}px)`,
+      maxHeight: `calc(100vh - ${theme.spacing(28.5)}px)`,
     },
     emptyStateMessage: {
       fontSize: '1.5rem',
@@ -95,10 +99,14 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+const rowsPerPageOptions = [5, 10, 15, 20];
+
 const CoinsTable: React.FC = () => {
   const styles = useStyles();
   const dispatch = useDispatch();
-  const coinsList = useSelector(getFilteredSortedCoinsList);
+  const coinsList = useSelector(getFilteredSortedPaginatedCoinsList);
+  const totalCoinsCount = useSelector(getFilteredSortedCoinsListCount);
+  const pagination = useSelector(getCoinsPagination);
   const isFetchingCoins = useSelector(getCoinsFetchingState);
   const { by: sortBy, order } = useSelector(getCoinsSorting);
   const filters = useSelector(getCoinsFilters);
@@ -147,79 +155,111 @@ const CoinsTable: React.FC = () => {
     [],
   );
 
+  const handleChangePage = useCallback(
+    (event: unknown, newPage: number) => {
+      dispatch(
+        setCoinsPagination({ page: newPage, perPage: pagination.perPage }),
+      );
+    },
+    [dispatch, pagination.perPage],
+  );
+
+  const handleRowsPerPageChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      dispatch(
+        setCoinsPagination({
+          page: 0,
+          perPage: parseInt(event.target.value, 10),
+        }),
+      );
+    },
+    [dispatch],
+  );
+
   return (
     <Container maxWidth="lg" className={styles.container}>
-      <TableContainer component={Paper} className={styles.tableCointainer}>
-        <Toolbar className={styles.toolbar}>
-          <Typography variant="h4" className={styles.title}>
-            Coins
-          </Typography>
-          <TextField
-            onChange={handleFilterChange}
-            name="name"
-            value={nameFilter}
-            placeholder="Name"
-            className={styles.search}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Toolbar>
-        <Table stickyHeader>
-          <TableHead>
-            <TableRow>
-              {tableConfig.map(({ name, label, numeric }) => (
-                <TableCell
-                  key={name}
-                  sortDirection={sortBy === name ? order : false}
-                  align={numeric ? 'right' : 'left'}
-                >
-                  <TableSortLabel
-                    active={sortBy === name}
-                    direction={sortBy === name ? order : Order.desc}
-                    onClick={() => handleOrderChange(name)}
+      <Paper>
+        <TableContainer className={styles.tableCointainer}>
+          <Toolbar className={styles.toolbar}>
+            <Typography variant="h4" className={styles.title}>
+              Coins
+            </Typography>
+            <TextField
+              onChange={handleFilterChange}
+              name="name"
+              value={nameFilter}
+              placeholder="Name"
+              className={styles.search}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Toolbar>
+          <Table stickyHeader>
+            <TableHead>
+              <TableRow>
+                {tableConfig.map(({ name, label, numeric }) => (
+                  <TableCell
+                    key={name}
+                    sortDirection={sortBy === name ? order : false}
+                    align={numeric ? 'right' : 'left'}
                   >
-                    {label}
-                  </TableSortLabel>
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {isFetchingCoins ? (
-              <TableRow>
-                <TableCell colSpan={6} align="center">
-                  <CircularProgress />
-                </TableCell>
+                    <TableSortLabel
+                      active={sortBy === name}
+                      direction={sortBy === name ? order : Order.desc}
+                      onClick={() => handleOrderChange(name)}
+                    >
+                      {label}
+                    </TableSortLabel>
+                  </TableCell>
+                ))}
               </TableRow>
-            ) : coinsList.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={6}
-                  align="center"
-                  className={styles.emptyStateMessage}
-                >
-                  No coins have been found.
-                </TableCell>
-              </TableRow>
-            ) : (
-              coinsList.map(coin => (
-                <TableRow key={coin.id}>
-                  {tableConfig.map(({ name, format, numeric }) => (
-                    <TableCell align={numeric ? 'right' : 'left'} key={name}>
-                      {format ? format(coin[name]) : coin[name]}
-                    </TableCell>
-                  ))}
+            </TableHead>
+            <TableBody>
+              {isFetchingCoins ? (
+                <TableRow>
+                  <TableCell colSpan={6} align="center">
+                    <CircularProgress />
+                  </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+              ) : coinsList.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={6}
+                    align="center"
+                    className={styles.emptyStateMessage}
+                  >
+                    No coins have been found.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                coinsList.map(coin => (
+                  <TableRow key={coin.id}>
+                    {tableConfig.map(({ name, format, numeric }) => (
+                      <TableCell align={numeric ? 'right' : 'left'} key={name}>
+                        {format ? format(coin[name]) : coin[name]}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <TablePagination
+          component="div"
+          rowsPerPageOptions={rowsPerPageOptions}
+          count={totalCoinsCount}
+          rowsPerPage={pagination.perPage}
+          page={pagination.page}
+          onChangePage={handleChangePage}
+          onChangeRowsPerPage={handleRowsPerPageChange}
+        />
+      </Paper>
     </Container>
   );
 };

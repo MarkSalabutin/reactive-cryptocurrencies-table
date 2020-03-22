@@ -7,6 +7,7 @@ import {
   FetchCoinsInfoSuccessPayload,
   SortCoinsPayload,
   SetCoinFiltersPayload,
+  SetCoinsPaginationPayload,
 } from './actions';
 
 const INITIAL_STATE: CoinsState = {
@@ -18,6 +19,10 @@ const INITIAL_STATE: CoinsState = {
   },
   filters: {
     name: '',
+  },
+  pagination: {
+    page: 0,
+    perPage: 10,
   },
 };
 
@@ -71,6 +76,16 @@ const setCoinFilters = (
   },
 });
 
+const setCoinsPagination = (
+  state: CoinsState,
+  payload: SetCoinsPaginationPayload,
+): CoinsState => ({
+  ...state,
+  pagination: {
+    ...payload,
+  },
+});
+
 const fetchCoinsInfoRequest = (state: CoinsState): CoinsState => ({
   ...state,
   isFetching: true,
@@ -101,6 +116,8 @@ const reducer = (
       return sortCoins(state, action.payload);
     case ActionTypes.SET_COIN_FILTERS:
       return setCoinFilters(state, action.payload);
+    case ActionTypes.SET_COINS_PAGINATION:
+      return setCoinsPagination(state, action.payload);
     case ActionTypes.FETCH_COINS_INFO_REQUEST:
       return fetchCoinsInfoRequest(state);
     case ActionTypes.FETCH_COINS_INFO_SUCCESS:
